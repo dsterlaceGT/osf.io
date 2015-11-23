@@ -15,8 +15,8 @@ from website.addons.onedrive import settings
 logger = logging.getLogger(__name__)
 
 
-class OnedriveNodeLogger(object):
-    """Helper class for adding correctly-formatted Onedrive logs to nodes.
+class OneDriveNodeLogger(object):
+    """Helper class for adding correctly-formatted OneDrive logs to nodes.
 
     Usage: ::
 
@@ -24,7 +24,7 @@ class OnedriveNodeLogger(object):
 
         node = ...
         auth = ...
-        nodelogger = OnedriveNodeLogger(node, auth)
+        nodelogger = OneDriveNodeLogger(node, auth)
         nodelogger.log(NodeLog.FILE_REMOVED, save=True)
 
 
@@ -95,3 +95,23 @@ def onedrive_addon_folder(node_settings, auth, **kwargs):
     )
 
     return [root]
+
+def to_hgrid(item, node, path):
+    """
+    :param item: contents returned from OneDrive API
+    :return: results formatted as required for Hgrid display
+    """
+    # quote fails on unicode objects with unicode characters
+    # covert to str with .encode('utf-8')
+    safe_name = quote(item['title'].encode('utf-8'), safe='')
+    path = os.path.join(path, safe_name)
+
+    serialized = {
+        'path': path,
+        'id': item['id'],
+        'kind': 'folder',
+        'name': safe_name,
+        'addon': 'onedrive',
+        'urls': build_onedrive_urls(item, node, path=path)
+    }
+    return serialized

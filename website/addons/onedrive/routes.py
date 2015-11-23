@@ -1,73 +1,67 @@
 # -*- coding: utf-8 -*-
-"""OneDrive addon routes."""
+"""Routes for the onedrive addon.
+"""
+
 from framework.routing import Rule, json_renderer
 
-from website.addons.onedrive import views
+from . import views
 
-
+# JSON endpoints
 api_routes = {
     'rules': [
+
+        #### Profile settings ###
+
         Rule(
             [
                 '/settings/onedrive/accounts/',
             ],
             'get',
-            views.onedrive_get_user_settings,
+            views.config.list_onedrive_user_accounts,
             json_renderer,
+
         ),
+
+        ##### Node settings #####
+
         Rule(
-            [
-                '/project/<pid>/onedrive/settings/',
-                '/project/<pid>/node/<nid>/onedrive/settings/'
-            ],
+            ['/project/<pid>/onedrive/folders/',
+             '/project/<pid>/node/<nid>/onedrive/folders/'],
             'get',
-            views.onedrive_get_config,
-            json_renderer,
+            views.hgrid.onedrive_folder_list,
+            json_renderer
         ),
+
         Rule(
-            [
-                '/project/<pid>/onedrive/settings/',
-                '/project/<pid>/node/<nid>/onedrive/settings/'
-            ],
+            ['/project/<pid>/onedrive/config/',
+             '/project/<pid>/node/<nid>/onedrive/config/'],
+            'get',
+            views.config.onedrive_config_get,
+            json_renderer
+        ),
+
+        Rule(
+            ['/project/<pid>/onedrive/config/',
+             '/project/<pid>/node/<nid>/onedrive/config/'],
             'put',
-            views.onedrive_set_config,
-            json_renderer,
+            views.config.onedrive_config_put,
+            json_renderer
         ),
+
         Rule(
-            [
-                '/project/<pid>/onedrive/user_auth/',
-                '/project/<pid>/node/<nid>/onedrive/user_auth/'
-            ],
-            'put',
-            views.onedrive_add_user_auth,
-            json_renderer,
-        ),
-        Rule(
-            [
-                '/project/<pid>/onedrive/user_auth/',
-                '/project/<pid>/node/<nid>/onedrive/user_auth/'
-            ],
+            ['/project/<pid>/onedrive/config/',
+             '/project/<pid>/node/<nid>/onedrive/config/'],
             'delete',
-            views.onedrive_remove_user_auth,
-            json_renderer,
+            views.config.onedrive_remove_user_auth,
+            json_renderer
         ),
+
         Rule(
-            [
-                '/project/<pid>/onedrive/config/share/',
-                '/project/<pid>/node/<nid>/onedrive/config/share/'
-            ],
-            'get',
-            views.onedrive_get_share_emails,
-            json_renderer,
-        ),
-        Rule(
-            [
-                '/project/<pid>/onedrive/folders/',
-                '/project/<pid>/node/<nid>/onedrive/folders/',
-            ],
-            'get',
-            views.onedrive_folder_list,
-            json_renderer,
+            ['/project/<pid>/onedrive/config/import-auth/',
+             '/project/<pid>/node/<nid>/onedrive/config/import-auth/'],
+            'put',
+            views.config.onedrive_import_user_auth,
+            json_renderer
         ),
     ],
     'prefix': '/api/v1'

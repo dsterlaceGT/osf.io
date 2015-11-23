@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 logging.getLogger('onedrive1').setLevel(logging.WARNING)
 
-class OnedriveSerializer(OAuthAddonSerializer):
+class OneDriveSerializer(OAuthAddonSerializer):
 
     def credentials_owner(self, user_settings=None):
         return user_settings.owner or self.user_settings.owner
@@ -48,7 +48,7 @@ class OnedriveSerializer(OAuthAddonSerializer):
         return {
             #'auth': api_url_for('oauth_connect',
              #                   service_name='onedrive'),
-            'importAuth': node.api_url_for('onedrive_add_user_auth'),
+            'importAuth': node.api_url_for('onedrive_import_user_auth'),
             'files': node.web_url_for('collect_file_trees'),
             'folders': node.api_url_for('onedrive_folder_list'),
             'config': node.api_url_for('onedrive_set_config'),
@@ -60,7 +60,7 @@ class OnedriveSerializer(OAuthAddonSerializer):
 
     def serialize_settings(self, node_settings, current_user, client=None):
         """View helper that returns a dictionary representation of a
-        OnedriveNodeSettings record. Provides the return value for the
+        OneDriveNodeSettings record. Provides the return value for the
         onedrive config endpoints.
         """
         
@@ -74,9 +74,9 @@ class OnedriveSerializer(OAuthAddonSerializer):
 
 #        if user_settings:
 #            try:
-#                client = client or OnedriveClient(user_settings.external_accounts[0].oauth_key)
+#                client = client or OneDriveClient(user_settings.external_accounts[0].oauth_key)
 #                client.get_user_info()
-#            except (OnedriveClientException, IndexError):
+#            except (OneDriveClientException, IndexError):
 #                valid_credentials = False
 
         result = {
@@ -104,6 +104,6 @@ class OnedriveSerializer(OAuthAddonSerializer):
 
                 result['folder'] = {
                     'path': path,
-                    'name': path.replace('All Files', '', 1) if path != 'All Files' else '/ (Full Onedrive)'
+                    'name': path.replace('All Files', '', 1) if path != 'All Files' else '/ (Full OneDrive)'
                 }
         return result

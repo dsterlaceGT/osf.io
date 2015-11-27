@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger('onedrive1').setLevel(logging.WARNING)
 
 class OneDrive(ExternalProvider):
-    name = 'OneDrive'
+    name = 'onedrive'
     short_name = 'onedrive'
 
     client_id = settings.ONEDRIVE_KEY
@@ -117,6 +117,7 @@ class OneDriveNodeSettings(StorageAddonBase, AddonOAuthNodeSettingsBase):
         'onedriveusersettings', backref='authorized'
     )
     folder_id = fields.StringField(default=None)
+    onedrive_id = fields.StringField(default=None)
     folder_name = fields.StringField()
     folder_path = fields.StringField()
 
@@ -160,21 +161,24 @@ class OneDriveNodeSettings(StorageAddonBase, AddonOAuthNodeSettingsBase):
             return None
 
         logger.debug('self::' + repr(self))
-        request.json.get('selected')
+        #request.json.get('selected')
 
         if not self._folder_data:
 
-            self.folder_name = self.folder_id #request.json.get('selected')['name']  # 'Test TBD' #self._folder_data['name']
-            self.path = self.folder_id
+            #self.folder_name = self.folder_id #request.json.get('selected')['name']  # 'Test TBD' #self._folder_data['name']
+            self.path = self.folder_name
 #             self.folder_path = '/'.join(
 #                 [x['name'] for x in self._folder_data['path_collection']['entries']]
 #                 + [self._folder_data['name']]
 #             )
             self.save()
 
-    def set_folder(self, folder_id, auth):
-        self.folder_id = str(folder_id)
-        self._update_folder_data()
+    def set_folder(self, folder, auth):
+        self.onedrive_id = folder['id']
+        self.folder_id = folder['name'] #folder['id']
+        self.folder_name = folder['name']
+        #self.path = 'TBD Path/'
+        #self._update_folder_data()
         self.save()
 
         if not self.complete:
@@ -215,10 +219,12 @@ class OneDriveNodeSettings(StorageAddonBase, AddonOAuthNodeSettingsBase):
         self.save()
 
     def serialize_waterbutler_credentials(self):
+        logger.debug("in serialize_waterbutler_credentials:: %s", repr(self))
         if not self.has_auth:
             raise exceptions.AddonError('Addon is not authorized')
 
     def serialize_waterbutler_settings(self):
+        logger.debug("in serialize_waterbutler_settings:: %s", repr(self))
         if self.folder_id is None:
             raise exceptions.AddonError('Folder is not configured')
         return {'folder': self.folder_id}
